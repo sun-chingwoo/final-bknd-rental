@@ -1,11 +1,9 @@
 import Vehicle, { ALLOWED_LOCATIONS } from "../models/Vehicle.js";
 
-// Public: Get allowed locations
 export async function getLocations(req, res) {
     res.status(200).json(ALLOWED_LOCATIONS);
 }
 
-// Public: Get all available vehicles
 export async function getAvailableVehicles(req, res) {
     try {
         const { search } = req.query;
@@ -18,11 +16,6 @@ export async function getAvailableVehicles(req, res) {
             ];
         }
 
-        // Exclude own vehicles from "Available to Rent" list? Optional, but good UX.
-        // if (req.user) {
-        //    query.ownerId = { $ne: req.user.id };
-        // }
-
         const vehicles = await Vehicle.find(query).populate("ownerId", "fullName profilePic");
         res.status(200).json(vehicles);
     } catch (error) {
@@ -30,7 +23,6 @@ export async function getAvailableVehicles(req, res) {
     }
 }
 
-// Protected: Create a listing
 export async function createVehicle(req, res) {
     try {
         const { name, location, price, images } = req.body;
@@ -49,7 +41,6 @@ export async function createVehicle(req, res) {
     }
 }
 
-// Protected: Get "My Vehicles" (As Owner)
 export async function getMyVehicles(req, res) {
     try {
         const vehicles = await Vehicle.find({ ownerId: req.user.id });
@@ -59,7 +50,6 @@ export async function getMyVehicles(req, res) {
     }
 }
 
-// Public/Protected: Get Single Vehicle
 export async function getVehicleById(req, res) {
     try {
         const vehicle = await Vehicle.findById(req.params.id).populate("ownerId", "fullName phoneNumber profilePic");
@@ -70,7 +60,6 @@ export async function getVehicleById(req, res) {
     }
 }
 
-// Protected: Update My Vehicle
 export async function updateVehicle(req, res) {
     try {
         const vehicle = await Vehicle.findById(req.params.id);
@@ -88,7 +77,6 @@ export async function updateVehicle(req, res) {
     }
 }
 
-// Protected: Soft Delete Vehicle
 export async function deleteVehicle(req, res) {
     try {
         const vehicle = await Vehicle.findById(req.params.id);
@@ -99,7 +87,7 @@ export async function deleteVehicle(req, res) {
         }
 
         vehicle.isDeleted = true;
-        vehicle.isAvailable = false; // Also make unavailable
+        vehicle.isAvailable = false; 
         await vehicle.save();
 
         res.status(200).json({ message: "Vehicle deleted successfully" });
