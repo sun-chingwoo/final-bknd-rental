@@ -77,7 +77,7 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const updates = req.body;
-        delete updates.password; // Do not allow password update here
+        delete updates.password;
 
         const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select("-password");
         res.status(200).json({ message: "Profile updated", user });
