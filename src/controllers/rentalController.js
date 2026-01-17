@@ -1,7 +1,7 @@
 import Rental from "../models/Rental.js";
 import Vehicle from "../models/Vehicle.js";
 
-// Book a Vehicle
+
 export async function bookVehicle(req, res) {
     try {
         const { vehicleId, startDate, endDate } = req.body;
@@ -32,7 +32,6 @@ export async function bookVehicle(req, res) {
     }
 }
 
-// Return a Vehicle
 export async function returnVehicle(req, res) {
     try {
         const rentalId = req.params.id;
@@ -40,7 +39,6 @@ export async function returnVehicle(req, res) {
 
         if (!rental) return res.status(404).json({ message: "Rental not found" });
 
-        // Ensure it's the renter returning it
         if (rental.renterId.toString() !== req.user.id) {
             return res.status(403).json({ message: "Not authorized to return this vehicle" });
         }
@@ -53,7 +51,6 @@ export async function returnVehicle(req, res) {
         rental.actualReturnDate = new Date();
         await rental.save();
 
-        // Mark vehicle as available
         await Vehicle.findByIdAndUpdate(rental.vehicleId, { isAvailable: true });
 
         res.status(200).json({ message: "Vehicle returned successfully", rental });
@@ -63,7 +60,6 @@ export async function returnVehicle(req, res) {
     }
 }
 
-// Get My Rentals (Active)
 export async function getMyActiveRentals(req, res) {
     try {
         const rentals = await Rental.find({ renterId: req.user.id, status: "active" })
@@ -75,7 +71,6 @@ export async function getMyActiveRentals(req, res) {
     }
 }
 
-// Get My Rental History
 export async function getMyRentalHistory(req, res) {
     try {
         const rentals = await Rental.find({ renterId: req.user.id, status: "completed" })
@@ -87,7 +82,6 @@ export async function getMyRentalHistory(req, res) {
     }
 }
 
-// Get Incoming Bookings (For Owners)
 export async function getOwnerBookings(req, res) {
     try {
         const rentals = await Rental.find({ ownerId: req.user.id })
